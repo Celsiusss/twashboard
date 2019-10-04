@@ -1,0 +1,28 @@
+.content {
+  padding-top: 8px;
+}
+
+.widget-header {
+  cursor: grab;
+}
+
+.widget-header:active {
+  cursor: grabbing;
+}
+
+.resize-area::after {
+  content: '';
+  cursor: nwse-resize;
+  width: 10px;
+  height: 10px;
+  background-color: red;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
+.card-widget {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+}

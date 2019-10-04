@@ -1,0 +1,22 @@
+<mat-toolbar color="primary">
+  <button mat-button (click)="sideNavOpen = !sideNavOpen">
+    <mat-icon aria-label="Open Menu">menu</mat-icon>
+  </button>
+  <span>Dashboard</span>
+  <button mat-button (click)="newWidget()">Add</button>
+</mat-toolbar>
+
+<mat-sidenav-container class="dashboard-container">
+  <mat-sidenav mode="side" [opened]="sideNavOpen">
+    <app-sidemenu></app-sidemenu>
+  </mat-sidenav>
+  <mat-sidenav-content class="dashboard-content">
+    <div class="widget-container">
+
+      <div class="widget" *ngFor="let component of widgets; index as i" #widgets>
+        <ng-template #widgetViews></ng-template>
+      </div>
+
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
