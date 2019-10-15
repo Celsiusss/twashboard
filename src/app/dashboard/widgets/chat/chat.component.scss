@@ -1,0 +1,21 @@
+.chat-line {
+  display: flex;
+  justify-items: center;
+
+  .badge {
+    height: 1em;
+    padding-right: 3px;
+    img {
+      height: 100%;
+    }
+  }
+
+  .username {
+    font-size: 1em;
+    line-height: 1.1em;
+    .text {
+    }
+    .message {
+    }
+  }
+}

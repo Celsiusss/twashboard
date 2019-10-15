@@ -18,7 +18,7 @@ export const environment = {
     client_id: '6zy82zk5z8qyl29807xf32lip0g90y',
     redirect_uri: 'http://localhost:4200'
   },
-  api: 'http://localhost:5000/twashboard-e51d4/us-central1/api/'
+  api: 'http://localhost:5001/twashboard-e51d4/us-central1/api/'
 };
 
 /*

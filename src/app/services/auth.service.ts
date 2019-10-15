@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import * as queryString from 'query-string';
 import { Router } from '@angular/router';
+import { AngularFireAuth } from '@angular/fire/auth';
 
 @Injectable({
   providedIn: 'root'
@@ -10,44 +11,96 @@ import { Router } from '@angular/router';
 export class AuthService {
   isSignedIn = false;
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private afAuth: AngularFireAuth
+  ) {}
 
-  signIn() {
-    const twitchAuthParams = {
-      client_id: environment.twitch.client_id,
-      redirect_uri: environment.twitch.redirect_uri,
-      response_type: 'code',
-      scope:
-        // tslint:disable-next-line:max-line-length
-        'openid analytics:read:games bits:read channel:read:subscriptions user:edit user:edit:broadcast user:read:broadcast user:read:email',
-      claims: JSON.stringify({
-        id_token: {
-          email: null
-        },
-        userinfo: {
-          picture: null,
-          preferred_username: null
-        }
-      })
+  async signIn() {
+    const twitchSignin = () => {
+      const twitchAuthParams = {
+        client_id: environment.twitch.client_id,
+        redirect_uri: environment.twitch.redirect_uri,
+        response_type: 'code',
+        scope:
+          // tslint:disable-next-line:max-line-length
+          'openid analytics:read:games bits:read channel:read:subscriptions user:edit user:edit:broadcast user:read:broadcast user:read:email chat:edit chat:read channel:moderate',
+        claims: JSON.stringify({
+          id_token: {
+            email: null,
+            sub: null
+          },
+          userinfo: {
+            picture: null,
+            preferred_username: null
+          }
+        })
+      };
+
+      const url =
+        'https://id.twitch.tv/oauth2/authorize?' +
+        queryString.stringify(twitchAuthParams, { encode: false });
+      location.href = url;
     };
 
-    const url =
-      'https://id.twitch.tv/oauth2/authorize?' +
-      queryString.stringify(twitchAuthParams, { encode: false });
-    location.href = url;
+    try {
+      const token = JSON.parse(localStorage.getItem('token'));
+      if (!token) {
+        return twitchSignin();
+      }
+      await this.afAuth.auth.signInWithCustomToken(token);
+      if (this.verifyLocalStorage()) {
+        this.router.navigate(['/dashboard']);
+      }
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   async getTokens(code: string) {
     try {
-      const response = await this.http
+      const response: any = await this.http
         .post(environment.api + 'auth/token', { code })
         .toPromise();
-      localStorage.setItem('twitch', JSON.stringify(response));
+      localStorage.setItem('twitch', JSON.stringify(response.twitch));
+      localStorage.setItem('token', JSON.stringify(response.token));
       this.isSignedIn = true;
-      // this.router.navigate(['/']);
+      await this.afAuth.auth.signInWithCustomToken(response.token);
+      if (this.verifyLocalStorage()) {
+        this.router.navigate(['/dashboard']);
+      }
       return response;
     } catch (error) {
       console.error('Failed to get tokens', error.message);
+    }
+  }
+
+  verifyLocalStorage() {
+    try {
+      const {
+        access_token,
+        expires_in,
+        id_token,
+        refresh_token,
+        scope,
+        token_type,
+        userId
+      } = JSON.parse(localStorage.getItem('twitch'));
+      const token = JSON.parse(localStorage.getItem('token'));
+      return (
+        access_token &&
+        expires_in &&
+        id_token &&
+        refresh_token &&
+        scope &&
+        token_type &&
+        userId &&
+        token_type &&
+        token
+      );
+    } catch (e) {
+      return false;
     }
   }
 

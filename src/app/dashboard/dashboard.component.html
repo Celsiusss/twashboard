@@ -3,7 +3,12 @@
     <mat-icon aria-label="Open Menu">menu</mat-icon>
   </button>
   <span>Dashboard</span>
-  <button mat-button (click)="newWidget()">Add</button>
+  <button mat-button [matMenuTriggerFor]="menu">Add</button>
+  <mat-menu #menu="matMenu">
+    <ng-container *ngFor="let widget of widgetsService.widgetSlugs">
+      <button mat-menu-item (click)="newWidget(widget)">{{ widget }}</button>
+    </ng-container>
+  </mat-menu>
 </mat-toolbar>
 
 <mat-sidenav-container class="dashboard-container">
@@ -12,11 +17,13 @@
   </mat-sidenav>
   <mat-sidenav-content class="dashboard-content">
     <div class="widget-container">
-
-      <div class="widget" *ngFor="let component of widgets; index as i" #widgets>
+      <div
+        class="widget"
+        *ngFor="let component of widgetsService.widgets; index as i"
+        #widgets
+      >
         <ng-template #widgetViews></ng-template>
       </div>
-
     </div>
   </mat-sidenav-content>
 </mat-sidenav-container>

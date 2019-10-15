@@ -1,0 +1,43 @@
+<div *ngFor="let message of chat.chatHistory">
+  <div
+    class="chat-line"
+    [ngStyle]="{ 'font-size': widgetConfig.config.font.value + 'em' }"
+  >
+    <ng-container *ngIf="message.message">
+      <span
+        class="badge"
+        *ngIf="
+          widgetConfig.config.badges.value &&
+          message.badges &&
+          message.badges.length
+        "
+      >
+        <ng-container *ngFor="let badge of message.badges">
+          <img
+            [src]="
+              chat.allBadges.badge_sets[badge.title].versions[badge.version]
+                .image_url_2x
+            "
+            [title]="
+              chat.allBadges.badge_sets[badge.title].versions[badge.version]
+                .title
+            "
+            [alt]="
+              chat.allBadges.badge_sets[badge.title].versions[badge.version]
+                .title
+            "
+          />
+        </ng-container>
+      </span>
+      <span class="text">
+        <span class="username" [ngStyle]="{ color: message.color }">{{
+          message.name
+        }}</span>
+        <span class="message">: {{ message.message }}</span>
+      </span>
+    </ng-container>
+    <ng-container *ngIf="!message.message">
+      <span class="message">{{ message }}</span>
+    </ng-container>
+  </div>
+</div>

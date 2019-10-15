@@ -2,17 +2,25 @@
   <mat-card-title
     class="widget-header"
     (mousedown)="onDrag()"
-    (mouseup)="onNoDrag()"
-    >Widget Title</mat-card-title
   >
+    <span>{{ widgetInformation.name }}</span>
+    <mat-menu #widgetMenu="matMenu">
+      <button (click)="openOptions()" mat-menu-item>
+        Options
+      </button>
+      <button (click)="widgetService.removeWidget(widgetId)" mat-menu-item>
+        Remove
+      </button>
+    </mat-menu>
+    <a class="more-button" mat-ripple [matMenuTriggerFor]="widgetMenu">
+      <mat-icon aria-label="options">more_vert</mat-icon>
+    </a>
+  </mat-card-title>
   <mat-card-content>
     <mat-divider></mat-divider>
     <div class="content">
-      <ng-content></ng-content>
+      <ng-template #component></ng-template>
     </div>
   </mat-card-content>
-  <span
-    class="resize-area"
-    (mousedown)="onStartResize()"
-  ></span>
+  <span class="resize-area" (mousedown)="onStartResize()"></span>
 </mat-card>

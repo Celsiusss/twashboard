@@ -1,0 +1,43 @@
+<h2 mat-dialog-title>Configuration</h2>
+<mat-dialog-content>
+  <form (ngSubmit)="save()" [formGroup]="form">
+    <div *ngFor="let option of configLayout">
+      <div [formGroup]="form">
+        <label [attr.for]="option.key">{{ option.key }}</label>
+      </div>
+
+      <div [ngSwitch]="option.key">
+        <mat-slide-toggle
+          *ngSwitchCase="'badges'"
+          [checked]="option.value.value"
+          [formControlName]="option.key"
+          [id]="option.key"
+          color="primary"
+        ></mat-slide-toggle>
+
+        <mat-form-field *ngSwitchCase="'font'">
+          <input
+            [formControlName]="option.key"
+            [id]="option.key"
+            [value]="option.value.value"
+            type="number"
+            matInput
+            required
+            min="0.1"
+            max="10"
+            step="0.1"
+          />
+        </mat-form-field>
+      </div>
+
+      <!--    <div *ngIf="option.value.type === 'toggle'">-->
+      <!--      <span>{{option.key}}</span>-->
+      <!--      <mat-slide-toggle [checked]="option.value.value"></mat-slide-toggle>-->
+      <!--    </div>-->
+    </div>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button color="accent" mat-dialog-close>Cancel</button>
+  <button mat-button color="primary" (click)="save()">Save</button>
+</mat-dialog-actions>

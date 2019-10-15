@@ -7,5 +7,5 @@ import { AuthService } from '../services/auth.service';
   styleUrls: ['./landing.component.scss']
 })
 export class LandingComponent {
-  constructor(private auth: AuthService) {}
+  constructor(public auth: AuthService) {}
 }

@@ -4,6 +4,24 @@
 
 .widget-header {
   cursor: grab;
+  display: flex;
+  justify-content: space-between;
+  justify-items: center;
+
+  .more-button {
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  span {
+    display: inline-flex;
+    align-items: center;
+  }
 }
 
 .widget-header:active {

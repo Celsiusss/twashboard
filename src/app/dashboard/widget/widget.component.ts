@@ -2,48 +2,80 @@ import {
   Component,
   ComponentFactoryResolver,
   EventEmitter,
-  OnInit,
   Output,
+  Type,
   ViewChild,
   ViewContainerRef
 } from '@angular/core';
-import { InformationComponent } from '../widgets/information/information.component';
+import { Widget, WidgetConfig, WidgetInformation } from '../../models';
+import { WidgetService } from '../services/widget.service';
+import { MatDialog } from '@angular/material';
+import { WidgetOptionsComponent } from './widget-options/widget-options.component';
+import { fromEvent } from 'rxjs';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-widget',
   templateUrl: './widget.component.html',
   styleUrls: ['./widget.component.scss']
 })
-export class WidgetComponent implements OnInit {
-  @Output() dragging = new EventEmitter<boolean>();
-  @Output() startResize = new EventEmitter<number>();
+export class WidgetComponent {
+  // outputs null on drag start, and the widgetId on drag end
+  @Output() dragging = new EventEmitter<string | null>();
+  @Output() startResize = new EventEmitter<string>();
   @ViewChild('component', { read: ViewContainerRef, static: true })
   viewContainerRef: ViewContainerRef;
+  componentInstance: Widget;
 
-  widgetIndex = 0;
+  widgetId: string;
 
-  constructor(private componentFactoryResolver: ComponentFactoryResolver) {}
+  widgetInformation: WidgetInformation = {
+    name: '',
+    initialHeight: 100,
+    initialWidth: 100
+  };
+  constructor(
+    private componentFactoryResolver: ComponentFactoryResolver,
+    public widgetService: WidgetService,
+    private dialog: MatDialog
+  ) {}
 
-  ngOnInit() {
-  }
-
-  initComponent() {
+  initComponent(component: Type<Widget>) {
     const componentFactory = this.componentFactoryResolver.resolveComponentFactory(
-      InformationComponent
+      component
     );
 
     const newComponentRef = this.viewContainerRef.createComponent(
       componentFactory
     );
+
+    this.widgetInformation = newComponentRef.instance.widgetInformation;
+    this.componentInstance = newComponentRef.instance;
+  }
+
+  openOptions() {
+    const dialogRef = this.dialog.open(WidgetOptionsComponent, {
+      width: '400px',
+      data: this.componentInstance.widgetConfig
+    });
+    dialogRef.afterClosed().subscribe((result: WidgetConfig) => {
+      if (result) {
+        this.componentInstance.widgetConfig = result;
+      }
+    });
   }
 
   onDrag() {
-    this.dragging.emit(true);
+    this.dragging.emit(null);
+
+    fromEvent(document, 'mouseup')
+      .pipe(take(1))
+      .subscribe(() => this.onNoDrag());
   }
   onNoDrag() {
-    this.dragging.emit(false);
+    this.dragging.emit(this.widgetId);
   }
   onStartResize() {
-    this.startResize.emit(this.widgetIndex);
+    this.startResize.emit(this.widgetId);
   }
 }
